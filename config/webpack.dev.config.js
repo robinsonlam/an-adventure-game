@@ -11,7 +11,8 @@ module.exports = {
     resolve: {
         alias: {
             'node_modules': path.join(__dirname, 'node_modules'),
-            '@assets': path.join(__dirname, '../src/assets')
+            '@assets': path.join(__dirname, '../src/assets'),
+            '@prefabs': path.join(__dirname, '../src/prefabs')
         }
     },
     plugins: [

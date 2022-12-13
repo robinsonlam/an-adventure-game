@@ -40,6 +40,28 @@ export default class SandboxScene extends Phaser.Scene {
             repeat: -1
         });
 
+        // Animation set - stand
+        this.anims.create({
+            key: 'stand-up',
+            frames: this.anims.generateFrameNumbers(PLAYER_1_ID, { start: 12, end: 17 }),
+            frameRate: 8,
+            repeat: -1
+        });
+
+        this.anims.create({
+            key: 'stand-side',
+            frames: this.anims.generateFrameNumbers(PLAYER_1_ID, { start: 6, end: 11 }),
+            frameRate: 8,
+            repeat: -1
+        });
+        
+        this.anims.create({
+            key: 'stand-down',
+            frames: this.anims.generateFrameNumbers(PLAYER_1_ID, { start: 0, end: 5 }),
+            frameRate: 8,
+            repeat: -1
+        });
+
         // * Bind Player Animations to Keyboard
         this.cursors = this.input.keyboard.createCursorKeys();
     }

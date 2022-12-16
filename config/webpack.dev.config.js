@@ -6,7 +6,8 @@ module.exports = {
     mode: 'development',
     output: {
         path: path.resolve(__dirname, '../dist'),
-        filename: 'an-adventure-game.bundle.js'
+        filename: '[name].bundle.js'
+        
     },
     resolve: {
         alias: {
@@ -14,6 +15,10 @@ module.exports = {
             '@assets': path.join(__dirname, '../src/assets'),
             '@prefabs': path.join(__dirname, '../src/prefabs')
         }
+    },
+    devtool: 'inline-source-map',
+    devServer: {
+        static: './dist',
     },
     plugins: [
         new HtmlWebpackPlugin()
@@ -29,5 +34,8 @@ module.exports = {
                 ],
             },
         ],
-    }
+    },
+    optimization: {
+        runtimeChunk: 'single',
+    },
 };

@@ -42,21 +42,21 @@ export default class SandboxScene extends Phaser.Scene {
 
         // Animation set - stand
         this.anims.create({
-            key: 'stand-up',
+            key: 'idle-up',
             frames: this.anims.generateFrameNumbers(PLAYER_1_ID, { start: 12, end: 17 }),
             frameRate: 8,
             repeat: -1
         });
 
         this.anims.create({
-            key: 'stand-side',
+            key: 'idle-side',
             frames: this.anims.generateFrameNumbers(PLAYER_1_ID, { start: 6, end: 11 }),
             frameRate: 8,
             repeat: -1
         });
         
         this.anims.create({
-            key: 'stand-down',
+            key: 'idle-down',
             frames: this.anims.generateFrameNumbers(PLAYER_1_ID, { start: 0, end: 5 }),
             frameRate: 8,
             repeat: -1
@@ -64,33 +64,57 @@ export default class SandboxScene extends Phaser.Scene {
 
         // * Bind Player Animations to Keyboard
         this.cursors = this.input.keyboard.createCursorKeys();
+
+        this.player.anims.play('idle-down', true);
     }
 
     update() {    
         const playerVelocityY = 120;
         const playerVelocityX = 160;
 
+        let idleY = false;
+        let idleX = false;
+
         // * Check Player Keyboard Actions
         if (this.cursors.up.isDown) {
             this.player.setVelocityY(-playerVelocityY);
             this.player.anims.play('walk-up', true);
+
+            this.player.facingDirection = 'up';
         } else if (this.cursors.down.isDown) {
             this.player.setVelocityY(playerVelocityY);
             this.player.anims.play('walk-down', true);
+
+            this.player.facingDirection = 'down';
         } else {
+            idleY = true;
             this.player.setVelocityY(0);
         }
         
         if (this.cursors.right.isDown) {
             this.player.setVelocityX(playerVelocityX);
             this.player.anims.play('walk-side', true);
+            this.player.facingDirection = 'right';
             this.player.flipX = false;
         } else if (this.cursors.left.isDown) {
             this.player.setVelocityX(-playerVelocityX);
             this.player.anims.play('walk-side', true);
+            this.player.facingDirection = 'left';
             this.player.flipX = true;
         } else {
+            idleX = true;
             this.player.setVelocityX(0);
         }
+
+        if (idleX && idleY) {
+            if (this.player.facingDirection === 'up') {
+                this.player.anims.play('idle-up', true);
+            } else if (this.player.facingDirection === 'down') {
+                this.player.anims.play('idle-down', true);
+            } else {
+                this.player.anims.play('idle-side', true);
+            }
+        }
+
     }
 }

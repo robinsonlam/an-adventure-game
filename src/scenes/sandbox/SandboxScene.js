@@ -18,7 +18,7 @@ export default class SandboxScene extends Phaser.Scene {
     create() {
         this.player = new Player(this, 100, 450, PLAYER_1_ID)
 
-        // Animation set
+        // Animation set - walk
         this.anims.create({
             key: 'walk-up',
             frames: this.anims.generateFrameNumbers(PLAYER_1_ID, { start: 30, end: 35 }),
@@ -40,7 +40,7 @@ export default class SandboxScene extends Phaser.Scene {
             repeat: -1
         });
 
-        // Animation set - stand
+        // Animation set - idle
         this.anims.create({
             key: 'idle-up',
             frames: this.anims.generateFrameNumbers(PLAYER_1_ID, { start: 12, end: 17 }),
@@ -62,10 +62,35 @@ export default class SandboxScene extends Phaser.Scene {
             repeat: -1
         });
 
+        
+        // Animation set - attack
+        this.anims.create({
+            key: 'attack-up',
+            frames: this.anims.generateFrameNumbers(PLAYER_1_ID, { start: 48, end: 51 }),
+            frameRate: 8,
+            repeat: 1
+        });
+
+        this.anims.create({
+            key: 'attack-side',
+            frames: this.anims.generateFrameNumbers(PLAYER_1_ID, { start: 42, end: 45 }),
+            frameRate: 8,
+            repeat: 1
+        });
+        
+        this.anims.create({
+            key: 'attack-down',
+            frames: this.anims.generateFrameNumbers(PLAYER_1_ID, { start: 36, end: 39 }),
+            frameRate: 8,
+            repeat: 1
+        });
+
         // * Bind Player Animations to Keyboard
         this.cursors = this.input.keyboard.createCursorKeys();
+        this.input.mouse.capture = true;
 
         this.player.anims.play('idle-down', true);
+        this.player.facingDirection = 'down';
     }
 
     update() {    
@@ -106,7 +131,17 @@ export default class SandboxScene extends Phaser.Scene {
             this.player.setVelocityX(0);
         }
 
-        if (idleX && idleY) {
+
+
+        if (this.input.activePointer.leftButtonDown()) {
+            if (this.player.facingDirection === 'up') {
+                this.player.anims.play('attack-up', true);
+            } else if (this.player.facingDirection === 'down') {
+                this.player.anims.play('attack-down', true);
+            } else if (this.player.facingDirection === 'left' || this.player.facingDirection === 'right') {
+                this.player.anims.play('attack-side', true);
+            }
+        } else if (idleX && idleY) {
             if (this.player.facingDirection === 'up') {
                 this.player.anims.play('idle-up', true);
             } else if (this.player.facingDirection === 'down') {

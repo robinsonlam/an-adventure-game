@@ -5,6 +5,15 @@ import Player from '@prefabs/player/Player';
 
 let PLAYER_1_ID = 'PLAYER_1'
 
+const getDirectionalKeys = ({ cursors, inputKeys }) => {
+    return {
+        up: cursors.up.isDown || inputKeys.up.isDown,
+        down: cursors.down.isDown || inputKeys.down.isDown,
+        left: cursors.left.isDown || inputKeys.left.isDown,
+        right: cursors.right.isDown || inputKeys.right.isDown,
+    }
+}
+
 export default class SandboxScene extends Phaser.Scene {
     constructor() {
         super({ key: 'SandboxScene' });
@@ -67,27 +76,34 @@ export default class SandboxScene extends Phaser.Scene {
         this.anims.create({
             key: 'attack-up',
             frames: this.anims.generateFrameNumbers(PLAYER_1_ID, { start: 48, end: 51 }),
-            frameRate: 8,
+            frameRate: 12,
             repeat: 1
         });
 
         this.anims.create({
             key: 'attack-side',
             frames: this.anims.generateFrameNumbers(PLAYER_1_ID, { start: 42, end: 45 }),
-            frameRate: 8,
+            frameRate: 12,
             repeat: 1
         });
         
         this.anims.create({
             key: 'attack-down',
             frames: this.anims.generateFrameNumbers(PLAYER_1_ID, { start: 36, end: 39 }),
-            frameRate: 8,
+            frameRate: 12,
             repeat: 1
         });
 
         // * Bind Player Animations to Keyboard
         this.cursors = this.input.keyboard.createCursorKeys();
         this.input.mouse.capture = true;
+
+        this.inputKeys = this.input.keyboard.addKeys({
+            up: Phaser.Input.Keyboard.KeyCodes.W,
+            down: Phaser.Input.Keyboard.KeyCodes.S,
+            left: Phaser.Input.Keyboard.KeyCodes.A,
+            right: Phaser.Input.Keyboard.KeyCodes.D,
+        })
 
         this.player.anims.play('idle-down', true);
         this.player.facingDirection = 'down';
@@ -100,54 +116,61 @@ export default class SandboxScene extends Phaser.Scene {
         let idleY = false;
         let idleX = false;
 
-        // * Check Player Keyboard Actions
-        if (this.cursors.up.isDown) {
-            this.player.setVelocityY(-playerVelocityY);
-            this.player.anims.play('walk-up', true);
-
-            this.player.facingDirection = 'up';
-        } else if (this.cursors.down.isDown) {
-            this.player.setVelocityY(playerVelocityY);
-            this.player.anims.play('walk-down', true);
-
-            this.player.facingDirection = 'down';
-        } else {
-            idleY = true;
-            this.player.setVelocityY(0);
-        }
-        
-        if (this.cursors.right.isDown) {
-            this.player.setVelocityX(playerVelocityX);
-            this.player.anims.play('walk-side', true);
-            this.player.facingDirection = 'right';
-            this.player.flipX = false;
-        } else if (this.cursors.left.isDown) {
-            this.player.setVelocityX(-playerVelocityX);
-            this.player.anims.play('walk-side', true);
-            this.player.facingDirection = 'left';
-            this.player.flipX = true;
-        } else {
-            idleX = true;
-            this.player.setVelocityX(0);
-        }
-
-
+        let directionKeys = getDirectionalKeys({ cursors: this.cursors, inputKeys: this.inputKeys });
+        let playerAnim = this.player.anims;
 
         if (this.input.activePointer.leftButtonDown()) {
+            this.player.setVelocityX(0);
+            this.player.setVelocityY(0);
+            
             if (this.player.facingDirection === 'up') {
-                this.player.anims.play('attack-up', true);
+                playerAnim.play('attack-up', true);
             } else if (this.player.facingDirection === 'down') {
-                this.player.anims.play('attack-down', true);
+                playerAnim.play('attack-down', true);
             } else if (this.player.facingDirection === 'left' || this.player.facingDirection === 'right') {
-                this.player.anims.play('attack-side', true);
+                playerAnim.play('attack-side', true);
             }
-        } else if (idleX && idleY) {
-            if (this.player.facingDirection === 'up') {
-                this.player.anims.play('idle-up', true);
-            } else if (this.player.facingDirection === 'down') {
-                this.player.anims.play('idle-down', true);
+        } else {
+            // * Check Player Keyboard Actions
+            if (directionKeys.up) {
+                this.player.setVelocityY(-playerVelocityY);
+                playerAnim.play('walk-up', true);
+
+                this.player.facingDirection = 'up';
+            } else if (directionKeys.down) {
+                this.player.setVelocityY(playerVelocityY);
+                playerAnim.play('walk-down', true);
+
+                this.player.facingDirection = 'down';
             } else {
-                this.player.anims.play('idle-side', true);
+                idleY = true;
+                this.player.setVelocityY(0);
+            }
+            
+            if (directionKeys.right) {
+                this.player.setVelocityX(playerVelocityX);
+                playerAnim.play('walk-side', true);
+                this.player.facingDirection = 'right';
+                this.player.flipX = false;
+            } else if (directionKeys.left) {
+                this.player.setVelocityX(-playerVelocityX);
+                playerAnim.play('walk-side', true);
+                this.player.facingDirection = 'left';
+                this.player.flipX = true;
+            } else {
+                idleX = true;
+                this.player.setVelocityX(0);
+            }
+
+
+            if (idleX && idleY) {
+                if (this.player.facingDirection === 'up') {
+                    playerAnim.play('idle-up', true);
+                } else if (this.player.facingDirection === 'down') {
+                    playerAnim.play('idle-down', true);
+                } else {
+                    playerAnim.play('idle-side', true);
+                }
             }
         }
 
